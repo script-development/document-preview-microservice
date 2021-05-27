@@ -8,7 +8,8 @@ Generate image previews
 - Body: `Multipart form`
 - Supported file types
   - image/**png**, image/**jpeg**, image/**gif**, image/**webp**
-  - application/**pdf**, _application/x-pdf, application/x-bzpdf, application/x-gzpdf_ (requires [poppler](https://repology.org/project/poppler/versions))
+  - application/**pdf**, _application/x-pdf, application/x-bzpdf, application/x-gzpdf_ (requires [pdftocairo from poppler](https://repology.org/project/poppler/versions))
+  - word, powerpoint and excel like files supported by openoffice (requires [soffice from openoffice](https://repology.org/project/openoffice/versions))
 
 ### Required fields:
 
