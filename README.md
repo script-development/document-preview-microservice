@@ -30,7 +30,3 @@ The most common document and image formats are supported!
 - `$KEY` **Required**: The Bearer key
 - `$SOFFICE_PATH`: If the soffice binary is not in the path you can set it in here
 - `$PORT`: Change the default port number (3030)
-
-## Note on container:
-
-The container uses the Microsoft TrueType core fonts that have a proprietary license
