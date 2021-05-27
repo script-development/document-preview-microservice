@@ -1,11 +1,13 @@
 # Generate document previews micro service
 
-Generate image previews
+A micro service for generating Generate document previews.
+The most common document and image formats are supported!
 
 ## `/api/preview`
 
 - Method: `POST`
 - Body: `Multipart form`
+- Auth: Bearer
 - Supported file types
   - image/**png**, image/**jpeg**, image/**gif**, image/**webp**
   - application/**pdf**, _application/x-pdf, application/x-bzpdf, application/x-gzpdf_ (requires [pdftocairo from poppler](https://repology.org/project/poppler/versions) OR [soffice from openoffice](https://repology.org/project/openoffice/versions))
