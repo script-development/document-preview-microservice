@@ -89,7 +89,13 @@ func main() {
 		return nil
 	})
 
-	app.Listen(":3030")
+	port := ":3030"
+	envPort := os.Getenv("PORT")
+	if len(envPort) > 0 {
+		port = ":" + envPort
+	}
+
+	app.Listen(port)
 }
 
 func reqFormSizeField(c *fiber.Ctx, field string) (int, error) {
