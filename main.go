@@ -22,7 +22,7 @@ import (
 
 func main() {
 	var supportedLock sync.Mutex
-	pdfSupported, officeSupported := supported()
+	supported := supported()
 
 	key := getKey()
 	if key == "" {
@@ -64,10 +64,9 @@ func main() {
 		}
 
 		supportedLock.Lock()
-		pdfSupportedCopy := pdfSupported
-		officeSupportedCopy := officeSupported
+		supportedCopy := supported
 		supportedLock.Unlock()
-		img, cropAlignTop, err := formFileToImage(serverFile, contentType, pdfSupportedCopy, officeSupportedCopy)
+		img, cropAlignTop, err := formFileToImage(serverFile, contentType, supportedCopy)
 		if err != nil {
 			return err
 		}

@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-func formFileToImage(serverFile multipart.File, contentType string, pdfSupported, officeSupported bool) (img image.Image, cropAlignTop bool, err error) {
+func formFileToImage(serverFile multipart.File, contentType string, supported Supported) (img image.Image, cropAlignTop bool, err error) {
 	// Just to be sure we have an extra close here
 	defer serverFile.Close()
 
@@ -20,15 +20,17 @@ func formFileToImage(serverFile multipart.File, contentType string, pdfSupported
 	case "image/webp", "image/png", "image/jpeg", "image/gif":
 		// Parse the image
 		img, _, err = image.Decode(serverFile)
-		if err != nil {
-			return nil, false, errors.New("unsupported file format")
-		}
+		return img, false, err
 	case "application/pdf", "application/x-pdf", "application/x-bzpdf", "application/x-gzpdf":
-		if !pdfSupported {
+		if !supported.PdfToCairo {
+			if supported.LibreOffice {
+				// libre office can also convert PDFs to images :)
+				img, err = convertOfficeToImageFromBytes(serverFile)
+				return img, true, err
+			}
+
 			return nil, false, fmt.Errorf("unsupported file content type %s", contentType)
 		}
-
-		cropAlignTop = true
 
 		// Create temp file with contents of input
 		filename, err := createTempFile(serverFile, "pdf")
@@ -39,9 +41,7 @@ func formFileToImage(serverFile multipart.File, contentType string, pdfSupported
 
 		// Convert the file to a image
 		img, err = convertPdfToImage(filename)
-		if err != nil {
-			return nil, false, err
-		}
+		return img, true, err
 	case
 		"application/vnd.oasis.opendocument.text", // .odt
 		"text/csv",           // .csv
@@ -52,28 +52,28 @@ func formFileToImage(serverFile multipart.File, contentType string, pdfSupported
 		"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
 		"application/msexcel": // .xls
 
-		if !officeSupported {
+		if !supported.LibreOffice {
 			return nil, false, fmt.Errorf("unsupported file content type %s", contentType)
 		}
 
 		cropAlignTop = true
 
-		// Create temp file with contents of input
-		filename, err := createTempFile(serverFile, "document")
-		if err != nil {
-			return nil, false, err
-		}
-		defer os.Remove(filename)
-
-		img, err = convertOfficeToImage(filename)
-		if err != nil {
-			return nil, false, err
-		}
+		img, err = convertOfficeToImageFromBytes(serverFile)
+		return img, true, err
 	default:
 		return nil, false, fmt.Errorf("unsupported file content type %s", contentType)
 	}
+}
 
-	return
+func convertOfficeToImageFromBytes(serverFile multipart.File) (image.Image, error) {
+	// Create temp file with contents of input
+	filename, err := createTempFile(serverFile, "document")
+	if err != nil {
+		return nil, err
+	}
+	defer os.Remove(filename)
+
+	return convertOfficeToImage(filename)
 }
 
 func convertOfficeToImage(filename string) (image.Image, error) {
