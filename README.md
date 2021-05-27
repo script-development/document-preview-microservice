@@ -18,8 +18,9 @@ Generate image previews
 
 ### Response:
 
-- `200`: image of content type `image/webp`
-- `500`: error string of type `text/plain`
+- `200`: Image of content type `image/webp`
+- `500`: Error string of type `text/plain`
+- `401`: Unauthorized of type `text/plain`
 
 ## Note on container:
 
