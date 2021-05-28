@@ -12,8 +12,11 @@ FROM ubuntu AS RUNTIME
 
 RUN ln -fs /usr/share/zoneinfo/Europe/Amsterdam /etc/localtime \
     && apt update \
-    && apt install -y poppler-utils libwebp6 libreoffice \
-    fonts-dejavu fonts-freefont-ttf fonts-ubuntu ttf-bitstream-vera
+    && apt install -y --no-install-recommends poppler-utils libwebp6 libreoffice \
+    fonts-dejavu fonts-freefont-ttf fonts-ubuntu ttf-bitstream-vera \
+    && apt autoremove \
+    && apt clean \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=BUILD /project/document-preview-microservice /
 
