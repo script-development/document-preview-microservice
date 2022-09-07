@@ -1,6 +1,6 @@
-FROM golang:1.16-buster AS BUILD
+FROM golang:1.18-bullseye AS BUILD
 
-RUN apt update && apt install -y libwebp-dev && mkdir /project
+RUN apt-get update && apt-get install -y libwebp-dev && mkdir /project
 
 WORKDIR /project
 
@@ -8,14 +8,17 @@ COPY ./ ./
 
 RUN go build
 
-FROM ubuntu AS RUNTIME
+FROM ubuntu:focal AS RUNTIME
+
+ARG DEBIAN_FRONTEND=noninteractive
 
 RUN ln -fs /usr/share/zoneinfo/Europe/Amsterdam /etc/localtime \
-    && apt update \
-    && apt install -y --no-install-recommends poppler-utils libwebp6 libreoffice \
-    fonts-dejavu fonts-freefont-ttf fonts-ubuntu ttf-bitstream-vera \
-    && apt autoremove \
-    && apt clean \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends poppler-utils libwebp6 libreoffice \
+    openjdk-17-jre-headless fonts-dejavu fonts-freefont-ttf fonts-ubuntu ttf-bitstream-vera \
+    && update-ca-certificates \
+    && apt-get autoremove \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=BUILD /project/document-preview-microservice /
