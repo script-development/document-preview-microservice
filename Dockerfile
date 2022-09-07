@@ -1,4 +1,4 @@
-FROM golang:1.18-bullseye AS BUILD
+FROM golang:1.19-bullseye AS BUILD
 
 RUN apt-get update && apt-get install -y libwebp-dev && mkdir /project
 
